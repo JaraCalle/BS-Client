@@ -34,6 +34,7 @@ public class Router
         return typeof(TController).Name switch
         {
             nameof(LoginController) => (IView)_services.GetRequiredService(typeof(LoginView)),
+            nameof(LobbyController) => (IView)_services.GetRequiredService(typeof(LobbyView)),
             nameof(GameController) => (IView)_services.GetRequiredService(typeof(GameView)),
             _ => throw new NotImplementedException($"No hay vista definida para {typeof(TController).Name}")
         };

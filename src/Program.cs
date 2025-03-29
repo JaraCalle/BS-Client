@@ -13,10 +13,12 @@ class Program
         
         // Registrar vistas
         services.AddTransient<LoginView>();
+        services.AddTransient<LobbyView>();
         services.AddTransient<GameView>();
         
         // Registrar controladores
         services.AddTransient<LoginController>();
+        services.AddTransient<LobbyController>();
         services.AddTransient<GameController>();
         
         // Construir el proveedor de servicios
