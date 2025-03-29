@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+
 public class Router
 {
     private readonly IServiceProvider _services;
@@ -17,7 +19,7 @@ public class Router
         }
 
         // Resolver el controlador
-        var controller = (IController)_services.GetService(typeof(TController));
+        var controller = (IController)_services.GetRequiredService(typeof(TController));
         
         // Resolver la vista asociada
         _currentView = GetViewForController<TController>();
@@ -31,8 +33,8 @@ public class Router
     {
         return typeof(TController).Name switch
         {
-            nameof(LoginController) => (IView)_services.GetService(typeof(LoginView)),
-            nameof(GameController) => (IView)_services.GetService(typeof(GameView)),
+            nameof(LoginController) => (IView)_services.GetRequiredService(typeof(LoginView)),
+            nameof(GameController) => (IView)_services.GetRequiredService(typeof(GameView)),
             _ => throw new NotImplementedException($"No hay vista definida para {typeof(TController).Name}")
         };
     }
