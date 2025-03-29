@@ -1,22 +1,30 @@
-public class LoginController 
+public class LoginController : IController
 {
     private readonly INetworkClient _networkClient;
-    public LoginController(INetworkClient networkClient)
+    private readonly Router _router;
+    
+    public LoginController(INetworkClient networkClient, Router router)
     {
         _networkClient = networkClient;
+        _router = router;
+    }
+
+    public async Task ExecuteAsync()
+    {
+        await _router.NavigateTo<LoginController>();
     }
 
 public async Task<bool> LoginAsync(string playerName)
 {
     // 1. Intentar establecer la conexión con un bucle
-    while (true)
+    while (!_networkClient.IsConnected)
     {
         try
         {
             await _networkClient.ConnectAsync();
             break;
         }
-        catch (Exception) {}
+        catch (Exception) { await Task.Delay(1000); }
     }
 
     try
@@ -35,7 +43,7 @@ public async Task<bool> LoginAsync(string playerName)
             return false;
         }
 
-        Console.WriteLine($"Bienvenido {playerName}");
+        await _router.NavigateTo<GameController>();
         return true;
     }
     catch (Exception ex)
@@ -57,6 +65,6 @@ private async Task<string> ReceiveWithTimeout(TimeSpan timeout)
         throw new TimeoutException("El servidor no respondió a tiempo");
     }
 
-    return await receiveTask;
+    return receiveTask.Result;
 }
 }

@@ -1,47 +1,31 @@
-public class GameController
+public class GameController : IController
 {
-    private readonly INetworkClient _networkClient;
+    private readonly Router _router;
+    
+    public GameController(Router router)
+    {
+        _router = router;
+    }
 
-    public GameController(INetworkClient networkClient)
+    public async Task ExecuteAsync()
     {
-        _networkClient = networkClient;
+        await Task.Delay(10);
+        await _router.NavigateTo<GameController>();
     }
-    public async Task<bool> SendAttackAsync(int x, int y)
-{
-    try
+    public async Task ProcessAttack(string coordinates)
     {
-        if (!_networkClient.IsConnected)
-        {
-            Console.WriteLine("No hay conexión con el servidor");
-            return false;
-        }
-        
-        // Enviar ataque
-        await _networkClient.SendAsync(BattleProtocol.BuildAttackMessage(x, y));
-        
-        // Esperar y validar respuesta
-        string response = await _networkClient.ReceiveAsync();
-        var (command, parameters) = BattleProtocol.ParseMessage(response);
-        
-        if (command != BattleProtocol.ATTACK_RESULT || parameters.Length < 1)
-        {
-            Console.WriteLine("Respuesta inesperada del servidor");
-            return false;
-        }
-        
-        bool hit = parameters[0] == "1";
-        string shipType = parameters.Length > 1 ? parameters[1] : "unknown";
-        
-        Console.WriteLine(hit 
-            ? $"¡Impacto en {x},{y} (Barco: {shipType})!" 
-            : $"Agua en {x},{y}");
-            
-        return true;
+        await Task.Delay(10);
+        Console.WriteLine($"Atacando {coordinates}");
     }
-    catch (Exception ex)
+
+    public char[,] GetBoard()
     {
-        Console.WriteLine($"Error durante el ataque: {ex.Message}");
-        return false;
+        // Obtener estado actual del tablero
+        return new char[10,10]; // Ejemplo
     }
-}
+
+    public async Task ExitGame()
+    {
+        await _router.NavigateTo<LoginController>();
+    }
 }
