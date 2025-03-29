@@ -16,19 +16,19 @@ class Program
 
             // Inicialización
             using INetworkClient networkClient = new NetworkClient(serverIp, serverPort);
-            var controller = new GameController(networkClient, playerName);
+            var loginController = new LoginController(networkClient);
             
             // Intento de inicio con validación
-            bool gameStarted = await controller.StartGameAsync();
+            bool isLogged = await loginController.LoginAsync(playerName);
             
-            if (!gameStarted)
+            if (!isLogged)
             {
                 Console.WriteLine("No se pudo iniciar el juego. Verifica el servidor.");
                 return;
             }
             
             // Bucle de juego principal
-            await GameLoop(controller);
+            //await GameLoop(controller);
         }
         catch (Exception ex)
         {

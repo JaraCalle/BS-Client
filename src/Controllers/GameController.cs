@@ -1,60 +1,11 @@
 public class GameController
 {
     private readonly INetworkClient _networkClient;
-    private readonly string _playerName;
 
-    public GameController(INetworkClient networkClient, string playerName)
+    public GameController(INetworkClient networkClient)
     {
         _networkClient = networkClient;
-        _playerName = playerName;
     }
-
-public async Task<bool> StartGameAsync()
-{
-    try
-    {
-        // 1. Establecer conexión
-        await _networkClient.ConnectAsync();
-        
-        // 2. Enviar comando CONNECT
-        await _networkClient.SendAsync(BattleProtocol.BuildConnectMessage(_playerName));
-        
-        // 3. Esperar respuesta START con timeout
-        string response = await ReceiveWithTimeout(TimeSpan.FromSeconds(10));
-        var (command, parameters) = BattleProtocol.ParseMessage(response);
-        
-        // 4. Validación estricta
-        if (command != BattleProtocol.START)
-        {
-            Console.WriteLine($"Error: Respuesta inesperada del servidor. Esperaba 'START', recibió '{command}'");
-            return false;
-        }
-        
-        Console.WriteLine("¡Juego iniciado correctamente!");
-        return true;
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error inicializando juego: {ex.Message}");
-        return false;
-    }
-}
-
-private async Task<string> ReceiveWithTimeout(TimeSpan timeout)
-{
-    var receiveTask = _networkClient.ReceiveAsync();
-    var timeoutTask = Task.Delay(timeout);
-    
-    var completedTask = await Task.WhenAny(receiveTask, timeoutTask);
-    
-    if (completedTask == timeoutTask)
-    {
-        throw new TimeoutException("El servidor no respondió a tiempo");
-    }
-    
-    return await receiveTask;
-}
-
     public async Task<bool> SendAttackAsync(int x, int y)
 {
     try
@@ -72,7 +23,7 @@ private async Task<string> ReceiveWithTimeout(TimeSpan timeout)
         string response = await _networkClient.ReceiveAsync();
         var (command, parameters) = BattleProtocol.ParseMessage(response);
         
-        if (command != BattleProtocol.RESULT || parameters.Length < 1)
+        if (command != BattleProtocol.ATTACK_RESULT || parameters.Length < 1)
         {
             Console.WriteLine("Respuesta inesperada del servidor");
             return false;
