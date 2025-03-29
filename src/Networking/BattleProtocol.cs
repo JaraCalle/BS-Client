@@ -2,26 +2,63 @@
 public static class BattleProtocol
 {
     // Constantes de comandos
-    public const string CONNECT = "CONNECT";
-    public const string START = "START";
+    public const string LOGIN = "LOGIN";
+    public const string LOGIN_OK = "LOGIN_OK";
+    public const string USER_LIST = "USER_LIST";
+    public const string USERS = "USERS";
+    public const string USER_CONNECT = "USER_CONNECT";
+    public const string USER_DISCONNECT = "USER_DISCONNECT";
+    public const string INVITE = "INVITE";
+    public const string INVITATION_RECEIVED = "INVITATION_RECEIVED";
+    public const string INVITATION_ACCEPTED = "INVITATION_ACCEPTED";
+    public const string INVITATION_DECLINE = "INVITATION_DECLINE";
+    public const string GAME_START = "GAME_START";
     public const string ATTACK = "ATTACK";
-    public const string RESULT = "RESULT";
+    public const string ATTACK_RESULT = "ATTACK_RESULT";
+    public const string OPPONENT_TURN = "OPPONENT_TURN";
+    public const string YOUR_TURN = "YOUR_TURN";
+    public const string GAME_OVER = "GAME_OVER";
+    public const string LOGOUT = "LOGOUT";
     public const string ERROR = "ERROR";
 
     // Delimitadores
     private const char COMMAND_DELIMITER = '|';
     private const char PARAMS_DELIMITER = '|';
 
-    ///Construye mensaje de conexión
-    public static string BuildConnectMessage(string playerName)
+    //Construye mensaje de conexión
+    public static string BuildLoginMessage(string playerName)
     {
-        return $"{CONNECT}{COMMAND_DELIMITER}{playerName}";
+        return $"{LOGIN}{COMMAND_DELIMITER}{playerName}";
+    }
+
+    //Construye mensaje de lista de usuarios
+    public static string BuildUsersListMessage()
+    {
+        return $"{USER_LIST}";
+    }
+
+    //Construye mensaje de invitación
+    public static string BuildInviteMessage(string playerName)
+    {
+        return $"{INVITE}{COMMAND_DELIMITER}{playerName}";
+    }
+
+    //Construye mensaje de aceptación de invitación
+    public static string BuildInvitationAcceptMessage(string playerName)
+    {
+        return $"{INVITATION_ACCEPTED}{COMMAND_DELIMITER}{playerName}";
     }
 
     // Construye mensaje de ataque
     public static string BuildAttackMessage(int x, int y)
     {
         return $"{ATTACK}{COMMAND_DELIMITER}{x}{PARAMS_DELIMITER}{y}";
+    }
+
+    //Construye mensaje de desconexión
+    public static string BuildLogoutMessage(string playerName)
+    {
+        return $"{LOGOUT}";
     }
 
     // Parsea un mensaje recibido
