@@ -54,7 +54,7 @@ public sealed class FileLogger : IDisposable
         {
             string timestamp = DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss");
             string logLevel = level.ToString().ToUpper();
-            string logMessage = $"[{timestamp}] [{logLevel}] {message}]";
+            string logMessage = $"[{timestamp}] [{logLevel}] {message}";
 
             if (exception != null)
             {
