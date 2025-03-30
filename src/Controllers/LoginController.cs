@@ -22,9 +22,14 @@ public class LoginController : IController
             try
             {
                 await _networkClient.ConnectAsync();
+                Log.Info("Cliente conectado al servidor exitosamente");
                 break;
             }
-            catch (Exception) { await Task.Delay(1000); }
+            catch (Exception ex)
+            {
+                Log.Error($"Error al conectar al servidor", ex);
+                await Task.Delay(2000);
+            }
         }
 
         try
@@ -39,16 +44,17 @@ public class LoginController : IController
             // 4. Validación estricta
             if (command != BattleProtocol.LOGIN_OK)
             {
-                Console.WriteLine($"Error: Respuesta inesperada del servidor. Esperaba LOGIN_OK, recibió {command}");
+                Log.Warning($"Respuesta inesperada del servidor, se esperaba LOGIN_OK, se recibió {command}");
                 return false;
             }
-
+            
+            Log.Info($"Se ha logeado {playerName} exitosamente");
             await _router.NavigateTo<LobbyController>();
             return true;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error haciendo el login: {ex.Message}");
+            Log.Error($"Error realizando el login", ex);
             return false;
         }
     }

@@ -46,7 +46,7 @@ class Program
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error fatal: {ex}");
+            Log.Error($"Error fatal al inicializar la aplicación", ex);
         }
         finally
         {
