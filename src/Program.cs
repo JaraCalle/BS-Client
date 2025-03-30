@@ -4,6 +4,19 @@ class Program
 {
     static async Task Main(string[] args)
     {
+        // Validar parámetros de log
+        if (args.Length == 0)
+        {
+            Console.WriteLine("Uso: ./client <logfile>");
+            Environment.Exit(1);
+        }
+
+        string logFilePath = Path.GetFullPath(args[0]);
+        
+        // Inicializar logger con el archivo especificado
+        FileLogger.Initialize(logFilePath);
+        AppDomain.CurrentDomain.ProcessExit += (s, e) => FileLogger.Instance?.Dispose();
+        
         // Configuración del DI container
         var services = new ServiceCollection();
         
@@ -27,6 +40,7 @@ class Program
         try
         {
             // Iniciar la aplicación
+            Log.Info($"Iniciando aplicación con archivo de log: {logFilePath}");
             var router = serviceProvider.GetRequiredService<Router>();
             await router.NavigateTo<LoginController>();
         }
