@@ -21,7 +21,7 @@ class Program
         var services = new ServiceCollection();
         
         // Registrar servicios
-        services.AddSingleton<INetworkClient>(_ => new NetworkClient("127.0.0.1", 8080));
+        services.AddSingleton<INetworkClient>(_ => new NetworkClient("127.0.0.1", 12345));
         services.AddSingleton<Router>();
         
         // Registrar vistas

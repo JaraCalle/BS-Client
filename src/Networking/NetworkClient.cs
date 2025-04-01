@@ -29,11 +29,11 @@ public class NetworkClient : INetworkClient
             var remoteEP = new IPEndPoint(ipAddress, _serverPort);
             
             await _socket.ConnectAsync(remoteEP);
-            Console.WriteLine($"Conectado al servidor {_serverIp}:{_serverPort}");
+            Log.Info($"Cliente conectado al servidor {_serverIp}:{_serverPort} exitosamente");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error de conexión: {ex.Message}");
+            Log.Error($"Error al conectar al sevidor", ex);
             throw;
         }
     }

@@ -22,12 +22,10 @@ public class LoginController : IController
             try
             {
                 await _networkClient.ConnectAsync();
-                Log.Info("Cliente conectado al servidor exitosamente");
                 break;
             }
             catch (Exception ex)
             {
-                Log.Error($"Error al conectar al servidor", ex);
                 await Task.Delay(2000);
             }
         }
@@ -37,18 +35,18 @@ public class LoginController : IController
             // 2. Enviar el comando LOGIN
             await _networkClient.SendAsync(BattleProtocol.BuildLoginMessage(playerName));
 
-            // 3. Esperar respuesta LOGIN_OK
+            // 3. Esperar respuesta OK
             string response = await _networkClient.ReceiveWithTimeout(TimeSpan.FromSeconds(10));
             var (command, parameters) = BattleProtocol.ParseMessage(response);
 
             // 4. Validación estricta
-            if (command != BattleProtocol.LOGIN_OK)
+            if (command != BattleProtocol.OK)
             {
-                Log.Warning($"Respuesta inesperada del servidor, se esperaba LOGIN_OK, se recibió {command}");
+                Log.Warning($"Respuesta inesperada del servidor, se esperaba OK, se recibió {command}");
                 return false;
             }
             
-            Log.Info($"Se ha logeado {playerName} exitosamente");
+            Log.Debug($"<{BattleProtocol.BuildLoginMessage(playerName)}> <{response}>");
             await _router.NavigateTo<LobbyController>();
             return true;
         }
