@@ -41,6 +41,12 @@ public static class BattleProtocol
     {
         return $"{INVITE}{COMMAND_DELIMITER}{playerName}";
     }
+    
+    //Construye mensaje de aceptación de invitación
+    public static string BuildInvitationAckMessage()
+    {
+        return $"{INVITATION_ACK}{COMMAND_DELIMITER}";
+    }
 
     //Construye mensaje de aceptación de invitación
     public static string BuildInvitationAcceptMessage(string playerName)

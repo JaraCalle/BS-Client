@@ -52,7 +52,7 @@ public class LoginController : IController
         }
         catch (Exception ex)
         {
-            Log.Error($"Error realizando el login", ex);
+            Log.Error($"Error durante la ejecución del programa", ex);
             return false;
         }
     }

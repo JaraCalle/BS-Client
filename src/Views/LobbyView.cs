@@ -11,19 +11,27 @@ public class LobbyView : IView
 
     public async Task RenderAsync()
     {
-        AnsiConsole.Clear();
-        var rule = new Rule("[bold yellow1]BATTLESHIP - LOBBY[/]")
-            .Border(BoxBorder.Heavy).Centered();
-        AnsiConsole.Write(rule);
-        
-        var usersList = await _controller.ListUsersAsync();
-        
-        var user = AnsiConsole.Prompt(new SelectionPrompt<string>()
-            .Title($"[bold green]Usuarios conectados[/]")
-            .PageSize(10)
-            .AddChoices(usersList)
-        );
-        
-        await _controller.InviteUserAsync(user);
+        while (true)
+        {
+            AnsiConsole.Clear();
+            AnsiConsole.Write(new Rule("[bold yellow1]BATTLESHIP - LOBBY[/]").Border(BoxBorder.Heavy).Centered());
+
+            var option = AnsiConsole.Prompt(new SelectionPrompt<string>()
+                .Title("[bold green]Selecciona una opción:[/]")
+                .AddChoices("Invitar Usuarios", "Esperar Invitaciones", "Salir")
+            );
+
+            switch (option)
+            {
+                case "Invitar Usuarios":
+                    await _controller.NavigateToInviteUsers();
+                    break;
+                case "Esperar Invitaciones":
+                    await _controller.NavigateToReceiveInvitations();
+                    break;
+                case "Salir":
+                    return;
+            }
+        }
     }
 }

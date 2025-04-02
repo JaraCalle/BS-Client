@@ -35,6 +35,8 @@ public class Router
         {
             nameof(LoginController) => (IView)_services.GetRequiredService(typeof(LoginView)),
             nameof(LobbyController) => (IView)_services.GetRequiredService(typeof(LobbyView)),
+            nameof(InviteUsersController) => (IView)_services.GetRequiredService(typeof(InviteUsersView)),
+            nameof(ReceiveInvitationsController) => (IView)_services.GetRequiredService(typeof(ReceiveInvitationsView)),
             nameof(GameController) => (IView)_services.GetRequiredService(typeof(GameView)),
             _ => throw new NotImplementedException($"No hay vista definida para {typeof(TController).Name}")
         };
