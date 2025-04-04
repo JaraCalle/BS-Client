@@ -26,6 +26,7 @@ public class LoginController : IController
             }
             catch (Exception ex)
             {
+                Log.Warning($"Conexión fallida, reintentandolo! {ex}");
                 await Task.Delay(2000);
             }
         }
@@ -52,6 +53,8 @@ public class LoginController : IController
         }
         catch (Exception ex)
         {
+            _networkClient.Disconnect();
+            Log.Info($"{_networkClient.IsConnected}");
             Log.Error($"Error durante la ejecución del programa", ex);
             return false;
         }
