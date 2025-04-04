@@ -3,7 +3,7 @@ using Spectre.Console;
 public class InviteUsersView : IView
 {
     private InviteUsersController _controller = null!;
-    private string[] _users = Array.Empty<string>();
+    private string[] _users = [];
 
     public void SetController(IController controller)
     {
@@ -13,7 +13,7 @@ public class InviteUsersView : IView
     public async Task RenderAsync()
     {
         AnsiConsole.Clear();
-        AnsiConsole.Write(new Rule("[bold yellow1]BATTLESHIP - INVITAR JUGADORES[/]").Border(BoxBorder.Heavy).Centered());
+        AnsiConsole.Write(new Rule("[bold yellow]BATTLESHIP - INVITAR JUGADORES[/]").Border(BoxBorder.Heavy).Centered());
 
         _users = await _controller.GetUserListAsync();
 
