@@ -23,10 +23,7 @@ public class ReceiveInvitationsView : IView
         Task.Run(async () =>
         {
             var accept = AnsiConsole.Confirm($"Has recibido una invitación de [bold]{sender}[/]. ¿Aceptarla?");
-            if (accept)
-            {
-                await _controller.AcceptInvitationAsync(sender);
-            }
+            await _controller.AcceptInvitationAsync(sender, accept);
         });
     }
 }

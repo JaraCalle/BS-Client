@@ -22,16 +22,22 @@ public class ReceiveInvitationsController : IController
             string response = await _networkClient.ReceiveAsync();
             var (command, parameters) = BattleProtocol.ParseMessage(response);
 
-            if (command == BattleProtocol.INVITATION_RECEIVED)
+            switch (command)
             {
-                string sender = parameters[0];
-                OnInvitationReceived?.Invoke(sender);
+                case BattleProtocol.INVITE_RECEIVED:
+                    string sender = parameters[0];
+                    OnInvitationReceived?.Invoke(sender);
+                    break;
+                
+                case BattleProtocol.GAME_START:
+                    Log.Debug("Game started");
+                    break;
             }
         }
     }
 
-    public async Task AcceptInvitationAsync(string sender)
+    public async Task AcceptInvitationAsync(string sender, bool accept)
     {
-        await _networkClient.SendAsync(BattleProtocol.BuildInvitationAcceptMessage(sender));
+        await _networkClient.SendAsync(BattleProtocol.BuildInvitationAcceptMessage(sender, accept));
     }
 }
