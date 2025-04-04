@@ -1,27 +1,18 @@
-public class LoginController : IController
+public class LoginController(INetworkClient networkClient, Router router, Player player) : IController
 {
-    private readonly INetworkClient _networkClient;
-    private readonly Router _router;
-    
-    public LoginController(INetworkClient networkClient, Router router)
-    {
-        _networkClient = networkClient;
-        _router = router;
-    }
-
     public async Task ExecuteAsync()
     {
-        await _router.NavigateTo<LoginController>();
+        await router.NavigateTo<LoginController>();
     }
 
     public async Task<bool> LoginAsync(string playerName)
     {
         // 1. Intentar establecer la conexión con un bucle
-        while (!_networkClient.IsConnected)
+        while (!networkClient.IsConnected)
         {
             try
             {
-                await _networkClient.ConnectAsync();
+                await networkClient.ConnectAsync();
                 break;
             }
             catch (Exception ex)
@@ -34,10 +25,10 @@ public class LoginController : IController
         try
         {
             // 2. Enviar el comando LOGIN
-            await _networkClient.SendAsync(BattleProtocol.BuildLoginMessage(playerName));
+            await networkClient.SendAsync(BattleProtocol.BuildLoginMessage(playerName));
 
             // 3. Esperar respuesta OK
-            string response = await _networkClient.ReceiveWithTimeout(TimeSpan.FromSeconds(10));
+            string response = await networkClient.ReceiveWithTimeout(TimeSpan.FromSeconds(10));
             var (command, parameters) = BattleProtocol.ParseMessage(response);
 
             // 4. Validación estricta
@@ -47,14 +38,18 @@ public class LoginController : IController
                 return false;
             }
             
+            player.Name = playerName;
+            
             Log.Debug($"<{BattleProtocol.BuildLoginMessage(playerName)}> <{response}>");
-            await _router.NavigateTo<LobbyController>();
+            await router.NavigateTo<LobbyController>();
             return true;
         }
         catch (Exception ex)
         {
-            _networkClient.Disconnect();
-            Log.Info($"{_networkClient.IsConnected}");
+            await networkClient.SendAsync(BattleProtocol.BuildLogoutMessage(playerName));
+            player.Name = "";
+            networkClient.Disconnect();
+            Log.Info($"CONEXIÓN: {networkClient.IsConnected}");
             Log.Error($"Error durante la ejecución del programa", ex);
             return false;
         }

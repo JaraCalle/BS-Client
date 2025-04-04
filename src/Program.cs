@@ -26,6 +26,12 @@ class Program
         // Registrar servicios
         services.AddSingleton(config);
         services.AddSingleton<Router>();
+        services.AddSingleton<Player>(_ => new Player(""));
+        services.AddSingleton<INetworkClient>(sp =>
+        {
+            var conf = sp.GetRequiredService<AppConfig>();
+            return new NetworkClient(conf.Host, conf.Port);
+        });
         
         // Registrar vistas
         services.AddTransient<LoginView>();
