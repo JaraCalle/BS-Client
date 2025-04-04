@@ -7,9 +7,9 @@ public static class BattleProtocol
     public const string USER_CONNECT = "USER_CONNECT";
     public const string USER_DISCONNECT = "USER_DISCONNECT";
     public const string INVITE = "INVITE";
-    public const string INVITATION_RECEIVED = "INVITE_FROM";
-    public const string INVITATION_ACK = "INVITATION_ACK";
-    public const string INVITATION_RESPONSE = "INVITATION_RESPONSE";
+    public const string INVITE_RECEIVED = "INVITE_FROM";
+    public const string INVITE_ACK = "INVITE_ACK";
+    public const string INVITE_RESPONSE = "INVITE_RESPONSE";
     public const string GAME_START = "GAME_START";
     public const string ATTACK = "ATTACK";
     public const string ATTACK_RESULT = "ATTACK_RESULT";
@@ -45,13 +45,14 @@ public static class BattleProtocol
     //Construye mensaje de aceptación de invitación
     public static string BuildInvitationAckMessage()
     {
-        return $"{INVITATION_ACK}{COMMAND_DELIMITER}";
+        return $"{INVITE_ACK}{COMMAND_DELIMITER}";
     }
 
     //Construye mensaje de aceptación de invitación
-    public static string BuildInvitationAcceptMessage(string playerName)
+    public static string BuildInvitationAcceptMessage(string playerName, bool isAccept)
     {
-        return $"{INVITATION_ACK}{COMMAND_DELIMITER}{playerName}";
+        string response = isAccept ? "accept" : "reject";
+        return $"{INVITE_ACK}{COMMAND_DELIMITER}{playerName} {response}";
     }
 
     // Construye mensaje de ataque
@@ -74,13 +75,20 @@ public static class BattleProtocol
         
         var parts = message.Split(COMMAND_DELIMITER);
         var command = parts[0];
-        var parameters = parts[1].Split(PARAMS_DELIMITER);
-
-        if (parameters.Contains(""))
+        string[] parameters = [];
+        try
         {
-            parameters = parameters.SubArray(0, parameters.Length - 1);
+            parameters = parts[1].Split(PARAMS_DELIMITER);
+            if (parameters.Contains(""))
+            {
+                parameters = parameters.SubArray(0, parameters.Length - 1);
+            }
         }
-
+        catch
+        {
+            Log.Warning("El comando llego mal formado falta el '|'");
+        }
+        
         return (command, parameters);
     }
 
