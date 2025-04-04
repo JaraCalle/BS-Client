@@ -16,22 +16,53 @@ public class InviteUsersController : IController
 
     public async Task<string[]> GetUserListAsync()
     {
-        await _networkClient.SendAsync(BattleProtocol.BuildUsersListMessage());
-        string response = await _networkClient.ReceiveWithTimeout(TimeSpan.FromSeconds(5));
-        var (command, users) = BattleProtocol.ParseMessage(response);
-        
-        if (command == BattleProtocol.OK)
-        {
-            Log.Debug($"<{BattleProtocol.BuildUsersListMessage()}> <{command}>");
-            return users;
-        }
-        
-        Log.Warning($"ERROR: RESPUESTA RECIBIDA: <{BattleProtocol.BuildUsersListMessage()}> {command}");
-        return Array.Empty<string>();
+        return await _networkClient.SendAndWaitForResponseAsync(BattleProtocol.BuildUsersListMessage(), BattleProtocol.OK);
     }
 
     public async Task InviteUserAsync(string playerName)
     {
-        await _networkClient.SendAsync(BattleProtocol.BuildInviteMessage(playerName));
+        await _networkClient.SendAndWaitForResponseAsync(BattleProtocol.BuildInviteMessage(playerName), BattleProtocol.OK);
+        string aceptation = "";
+        
+        try
+        {
+            do
+            {
+                string response = await _networkClient.ReceiveWithTimeout(TimeSpan.FromSeconds(60));
+                var (command, parameters) = BattleProtocol.ParseMessage(response);
+                
+                Log.Warning($"ESTA ES LA RESPONSE DEL SERVER {response}");
+
+                if (command == BattleProtocol.INVITE_RESPONSE)
+                {
+                    aceptation = parameters[0];
+                    break;
+                }
+                
+            } while(true);
+        }
+        catch (Exception e)
+        {
+            Log.Error($"Error al esperar la respuesta de la invitación", e);
+        }
+
+        if (aceptation != "accept")
+        {
+            return; 
+        }
+        
+        do
+        {
+            string response = await _networkClient.ReceiveAsync();
+            var (command, parameters) = BattleProtocol.ParseMessage(response);
+            
+            if (command == BattleProtocol.GAME_START)
+            {
+                Log.Debug("Game started PARA EL CLIENTE QUE ENVIO LA INVITACIÓN");
+                break;
+            }
+            
+        } while(true);
+        
     }
 }
