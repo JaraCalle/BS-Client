@@ -47,7 +47,24 @@ public class NetworkClient : INetworkClient
         byte[] byteData = Encoding.UTF8.GetBytes(fullMessage);
         
         await _socket.SendAsync(byteData, SocketFlags.None);
-        Console.WriteLine($"Enviado: {message}");
+        Log.Debug($"Enviado: <{message}>");
+    }
+    
+    public async Task<string[]> SendAndWaitForResponseAsync(string message, string expectedResponse)
+    {
+        await SendAsync(message);
+        var result = await ReceiveAsync();
+        var (command, parameters) = BattleProtocol.ParseMessage(result);
+        
+        Log.Debug($"<{message}> <{result}>");
+        
+        if (command == expectedResponse)
+        {
+            return parameters;
+        }
+        
+        Log.Warning("Respuesta inesperada del servidor");
+        return [];
     }
 
     public async Task<string> ReceiveAsync()
@@ -61,7 +78,7 @@ public class NetworkClient : INetworkClient
         string response = Encoding.UTF8.GetString(buffer, 0, bytesRead);
         response = response.Replace(MESSAGE_TERMINATOR, "");
         
-        Console.WriteLine($"Recibido: {response}");
+        Log.Debug($"Recibido: <{response}>");
         return response;
     }
 

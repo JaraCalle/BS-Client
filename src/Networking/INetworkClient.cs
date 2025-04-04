@@ -10,6 +10,8 @@ public interface INetworkClient : IDisposable
     Task ConnectAsync();
     // Enviar un mensaje al servidor
     Task SendAsync(string message);
+    //Enviar y Esperar una respuesta
+    Task<string[]> SendAndWaitForResponseAsync(string message, string expectedResponse);
     // Recibir un mensaje del servidor
     Task<string> ReceiveAsync();
     // Cerrar la conexión
