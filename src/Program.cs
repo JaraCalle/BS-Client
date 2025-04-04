@@ -12,16 +12,19 @@ class Program
         }
 
         string logFilePath = Path.GetFullPath(args[0]);
-        
+
         // Inicializar logger con el archivo especificado
         FileLogger.Initialize(logFilePath);
         AppDomain.CurrentDomain.ProcessExit += (s, e) => FileLogger.Instance?.Dispose();
         
+        string configPath = Path.Combine(AppContext.BaseDirectory, "config.json");
+        AppConfig config = AppConfig.LoadFromJson(configPath);
+
         // Configuración del DI container
         var services = new ServiceCollection();
         
         // Registrar servicios
-        services.AddSingleton<INetworkClient>(_ => new NetworkClient("127.0.0.1", 12345));
+        services.AddSingleton(config);
         services.AddSingleton<Router>();
         
         // Registrar vistas
