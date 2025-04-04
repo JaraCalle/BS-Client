@@ -1,22 +1,30 @@
 // Implementación del protocolo de comunicación personalizado para Battleship
 public static class BattleProtocol
 {
-    // Constantes de comandos
+    // Inicio de sesión
     public const string LOGIN = "LOGIN";
+    public const string LOGOUT = "LOGOUT";
+    
+    //Listar usuario
     public const string USER_LIST = "USER_LIST";
     public const string USER_CONNECT = "USER_CONNECT";
     public const string USER_DISCONNECT = "USER_DISCONNECT";
-    public const string INVITE = "INVITE";
-    public const string INVITE_RECEIVED = "INVITE_FROM";
-    public const string INVITE_ACK = "INVITE_ACK";
-    public const string INVITE_RESPONSE = "INVITE_RESPONSE";
+    
+    // Invitaciones
+    public const string INVITE = "INVITE_SEND";
+    public const string INVITE_RECEIVED = "INVITE_RECEIVED";
+    public const string INVITE_ACK = "INVITE_REPLY";
+    public const string INVITE_RESPONSE = "INVITE_RESULT";
+    
+    // Control de la partida
     public const string GAME_START = "GAME_START";
     public const string ATTACK = "ATTACK";
     public const string ATTACK_RESULT = "ATTACK_RESULT";
     public const string TURN = "TURN";
     public const string GAME_OVER = "GAME_OVER";
-    public const string LOGOUT = "LOGOUT";
     public const string ERROR = "ERROR";
+    
+    // Confirmaciones
     public const string OK = "OK";
     public const string ACK = "ACK";
 
