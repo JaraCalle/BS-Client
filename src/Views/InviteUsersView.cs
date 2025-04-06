@@ -14,25 +14,32 @@ public class InviteUsersView : IView
     {
         AnsiConsole.Clear();
         AnsiConsole.Write(new Rule("[bold yellow]BATTLESHIP - INVITAR JUGADORES[/]").Border(BoxBorder.Heavy).Centered());
-
-        _users = await _controller.GetUserListAsync();
-
+        
         while (true)
         {
-            if (_users.Length == 0)
-            {
-                AnsiConsole.MarkupLine("[red]No hay jugadores disponibles...[/]");
-                await Task.Delay(2000);
-                return;
-            }
-
+            _users = await _controller.GetUserListAsync();
+            _users = _users
+                .Append("[yellow]Refrescar lista de usuarios[/]")
+                .Append("[yellow]Volver al menú[/]")
+                .ToArray();
+            
             var user = AnsiConsole.Prompt(new SelectionPrompt<string>()
                 .Title("[bold green]Selecciona el usuario que deseas invitar[/]")
                 .PageSize(10)
                 .AddChoices(_users)
             );
-
-            await _controller.InviteUserAsync(user);
+            
+            switch (user)
+            {
+                case "[yellow]Refrescar lista de usuarios[/]":
+                    break;
+                case "[yellow]Volver al menú[/]":
+                    await _controller.NavigateToLobby();
+                    break;
+                default:
+                    await _controller.InviteUserAsync(user);
+                    break;
+            }
         }
     }
 }

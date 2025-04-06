@@ -18,7 +18,7 @@ public class LobbyView : IView
 
             var option = AnsiConsole.Prompt(new SelectionPrompt<string>()
                 .Title("[bold green]Selecciona una opción:[/]")
-                .AddChoices("Invitar Usuarios", "Esperar Invitaciones", "Salir")
+                .AddChoices("Invitar Usuarios", "Ver Invitaciones", "Salir")
             );
 
             switch (option)
@@ -26,7 +26,7 @@ public class LobbyView : IView
                 case "Invitar Usuarios":
                     await _controller.NavigateToInviteUsers();
                     break;
-                case "Esperar Invitaciones":
+                case "Ver Invitaciones":
                     await _controller.NavigateToReceiveInvitations();
                     break;
                 case "Salir":

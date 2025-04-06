@@ -9,7 +9,12 @@ public class InviteUsersController(INetworkClient networkClient, Router router, 
 
     public async Task<string[]> GetUserListAsync()
     {
-        return  await networkClient.SendAndWaitForResponseAsync(BattleProtocol.BuildUsersListMessage(), BattleProtocol.OK);
+        var users = await networkClient.SendAndWaitForResponseAsync(
+            BattleProtocol.BuildUsersListMessage(), 
+            BattleProtocol.OK
+            );
+        
+        return users.Where(u => u != $"{player.Name}:Available").ToArray();
     }
 
     public async Task InviteUserAsync(string playerName)
@@ -41,8 +46,10 @@ public class InviteUsersController(INetworkClient networkClient, Router router, 
                                 flag = true;
                             }
                             break;
+                        
                         case BattleProtocol.TURN:
                             flag = true;
+                            gameSession.OpponentName = playerName;
                             gameSession.IsMyTurn = player.Name == parameters[0];
                             await router.NavigateTo<GameController>();
                             break;
@@ -55,5 +62,10 @@ public class InviteUsersController(INetworkClient networkClient, Router router, 
         {
             Log.Error($"Error al esperar la respuesta de la invitación", e);
         }
+    }
+
+    public async Task NavigateToLobby()
+    {
+        await router.NavigateTo<LobbyController>();
     }
 }

@@ -13,13 +13,14 @@ public class ReceiveInvitationsView : IView
     public async Task RenderAsync()
     {
         AnsiConsole.Clear();
-        AnsiConsole.Write(new Rule("[bold yellow1]BATTLESHIP - ESPERANDO INVITACIONES[/]").Border(BoxBorder.Heavy).Centered());
+        AnsiConsole.Write(new Rule("[bold yellow]BATTLESHIP - ESPERANDO INVITACIONES[/]").Border(BoxBorder.Heavy).Centered());
         
         var panel = new Panel("[cyan]Recibiendo todas las invitaciones entrantes[/]")
             .Border(BoxBorder.Double)
             .Expand();
 
         AnsiConsole.Write(panel);
+        AnsiConsole.MarkupLine("[paleturquoise4 underline]Si no llega una en 30 segundos volveras al Lobby[/]");
         
         await _controller.ListenForInvitationsAsync();
     }
@@ -28,7 +29,7 @@ public class ReceiveInvitationsView : IView
     {
         Task.Run(async () =>
         {
-            var accept = AnsiConsole.Confirm($"Has recibido una invitación de [bold green1]{sender}[/]. ¿Aceptarla?");
+            var accept = AnsiConsole.Confirm($"Has recibido una invitación de [bold green]{sender}[/]. ¿Aceptarla?");
             await _controller.AcceptInvitationAsync(sender, accept);
         });
     }

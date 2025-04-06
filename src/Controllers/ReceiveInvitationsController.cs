@@ -9,31 +9,42 @@ public class ReceiveInvitationsController(INetworkClient networkClient, Router r
 
     public async Task ListenForInvitationsAsync()
     {
-        while (true)
+        try
         {
-            string response = await networkClient.ReceiveAsync();
-            var commandStack = BattleProtocol.ParseMessage(response);
-
-            foreach (var (command, parameters) in commandStack)
+            while (true)
             {
-                switch (command)
+                string response = await networkClient.ReceiveWithTimeout(TimeSpan.FromSeconds(30));
+                var commandStack = BattleProtocol.ParseMessage(response);
+
+                foreach (var (command, parameters) in commandStack)
                 {
-                    case BattleProtocol.INVITE_RECEIVED:
-                        string sender = parameters[0];
-                        OnInvitationReceived?.Invoke(sender);
-                        break;
+                    switch (command)
+                    {
+                        case BattleProtocol.INVITE_RECEIVED:
+                            string sender = parameters[0];
+                            OnInvitationReceived?.Invoke(sender);
+                            break;
                     
-                    case BattleProtocol.TURN:
-                        gameSession.IsMyTurn = player.Name == parameters[0];
-                        await router.NavigateTo<GameController>();
-                        break;
+                        case BattleProtocol.TURN:
+                            gameSession.IsMyTurn = player.Name == parameters[0];
+                            await router.NavigateTo<GameController>();
+                            break;
+                    }
                 }
             }
+        }
+        catch (Exception)
+        {
+            await router.NavigateTo<LobbyController>();
         }
     }
 
     public async Task AcceptInvitationAsync(string sender, bool accept)
     {
         await networkClient.SendAsync(BattleProtocol.BuildInvitationAcceptMessage(sender, accept));
+        if (accept)
+        {
+            gameSession.OpponentName = sender;
+        }
     }
 }
