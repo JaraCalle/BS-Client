@@ -1,43 +1,39 @@
-public class ReceiveInvitationsController : IController
+public class ReceiveInvitationsController(INetworkClient networkClient, Router router, Player player, GameSession gameSession) : IController
 {
-    private readonly Router _router;
-    private readonly INetworkClient _networkClient;
     public event Action<string>? OnInvitationReceived;
 
-    public ReceiveInvitationsController(INetworkClient networkClient, Router router)
-    {
-        _networkClient = networkClient;
-        _router = router;
-    }
-    
     public async Task ExecuteAsync()
     {
-        await _router.NavigateTo<ReceiveInvitationsController>();
+        await router.NavigateTo<ReceiveInvitationsController>();
     }
 
     public async Task ListenForInvitationsAsync()
     {
         while (true)
         {
-            string response = await _networkClient.ReceiveAsync();
-            var (command, parameters) = BattleProtocol.ParseMessage(response);
+            string response = await networkClient.ReceiveAsync();
+            var commandStack = BattleProtocol.ParseMessage(response);
 
-            switch (command)
+            foreach (var (command, parameters) in commandStack)
             {
-                case BattleProtocol.INVITE_RECEIVED:
-                    string sender = parameters[0];
-                    OnInvitationReceived?.Invoke(sender);
-                    break;
-                
-                case BattleProtocol.GAME_START:
-                    Log.Debug("Game started");
-                    break;
+                switch (command)
+                {
+                    case BattleProtocol.INVITE_RECEIVED:
+                        string sender = parameters[0];
+                        OnInvitationReceived?.Invoke(sender);
+                        break;
+                    
+                    case BattleProtocol.TURN:
+                        gameSession.IsMyTurn = player.Name == parameters[0];
+                        await router.NavigateTo<GameController>();
+                        break;
+                }
             }
         }
     }
 
     public async Task AcceptInvitationAsync(string sender, bool accept)
     {
-        await _networkClient.SendAsync(BattleProtocol.BuildInvitationAcceptMessage(sender, accept));
+        await networkClient.SendAsync(BattleProtocol.BuildInvitationAcceptMessage(sender, accept));
     }
 }

@@ -26,6 +26,7 @@ class Program
         // Registrar servicios
         services.AddSingleton(config);
         services.AddSingleton<Router>();
+        services.AddSingleton<GameSession>();
         services.AddSingleton<Player>(_ => new Player(""));
         services.AddSingleton<INetworkClient>(sp =>
         {

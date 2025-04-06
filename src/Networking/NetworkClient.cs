@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -26,10 +27,10 @@ public class NetworkClient : INetworkClient
         try
         {
             var ipAddress = IPAddress.Parse(_serverIp);
-            var remoteEP = new IPEndPoint(ipAddress, _serverPort);
+            var remoteEp = new IPEndPoint(ipAddress, _serverPort);
             
-            await _socket.ConnectAsync(remoteEP);
-            Log.Info($"Cliente conectado al servidor {_serverIp}:{_serverPort} exitosamente");
+            Log.Info($"Cliente intentando conectar al servidor {_serverIp}:{_serverPort}");
+            await _socket.ConnectAsync(remoteEp);
         }
         catch (Exception ex)
         {
@@ -54,13 +55,16 @@ public class NetworkClient : INetworkClient
     {
         await SendAsync(message);
         var result = await ReceiveAsync();
-        var (command, parameters) = BattleProtocol.ParseMessage(result);
-        
-        Log.Debug($"<{message}> <{result}>");
-        
-        if (command == expectedResponse)
+        var commandStack = BattleProtocol.ParseMessage(result);
+
+        foreach (var (command, parameters) in commandStack)
         {
-            return parameters;
+            if (command == expectedResponse)
+            {
+                string localIp = await NetworkUtils.GetPublicIpAddressAsync();
+                Log.Debug($"<{localIp}> <{message}> <{result}>");
+                return parameters;
+            }
         }
         
         Log.Warning("Respuesta inesperada del servidor");

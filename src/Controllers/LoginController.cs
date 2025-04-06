@@ -29,20 +29,19 @@ public class LoginController(INetworkClient networkClient, Router router, Player
 
             // 3. Esperar respuesta OK
             string response = await networkClient.ReceiveWithTimeout(TimeSpan.FromSeconds(10));
-            var (command, parameters) = BattleProtocol.ParseMessage(response);
+            var commandStack = BattleProtocol.ParseMessage(response);
 
-            // 4. Validación estricta
-            if (command != BattleProtocol.OK)
+            foreach (var (command, parameters) in commandStack)
             {
-                Log.Warning($"Respuesta inesperada del servidor, se esperaba OK, se recibió {command}");
-                return false;
+                if (command == BattleProtocol.OK)
+                {
+                    player.Name = playerName;
+                    Log.Debug($"<IP> <{BattleProtocol.BuildLoginMessage(playerName)}> <{response}>");
+                    await router.NavigateTo<LobbyController>();
+                    return true;
+                }
             }
-            
-            player.Name = playerName;
-            
-            Log.Debug($"<{BattleProtocol.BuildLoginMessage(playerName)}> <{response}>");
-            await router.NavigateTo<LobbyController>();
-            return true;
+            return false;
         }
         catch (Exception ex)
         {

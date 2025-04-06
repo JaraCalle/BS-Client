@@ -1,21 +1,37 @@
-public class GameController : IController
-{
-    private readonly Router _router;
-    
-    public GameController(Router router)
-    {
-        _router = router;
-    }
+using Spectre.Console;
+using Spectre.Console.Rendering;
 
+public class GameController(INetworkClient networkClient, Router router, Player player, GameSession gameSession) : IController
+{
     public async Task ExecuteAsync()
     {
-        await Task.Delay(10);
-        await _router.NavigateTo<GameController>();
+        await router.NavigateTo<GameController>();
     }
+
+    public async Task GameLoop()
+    {
+        if (gameSession.IsMyTurn)
+        {
+            var input = AnsiConsole.Ask<string>("Ingresa coordenadas (ej. A5) o [red]ff[/] para salir:");
+            if (input.ToLower() == "ff")
+            {
+                await Surrender();
+            }
+            await ProcessAttack(input);
+        }
+        else
+        {
+            AnsiConsole.MarkupLine($"Esperando que [green1 underline]{player.Name}[/] ataque...");
+            var response = await networkClient.ReceiveWithTimeout(TimeSpan.FromSeconds(30));
+            Log.Debug($"Response: {response}");
+        }
+    }
+    
     public async Task ProcessAttack(string coordinates)
     {
-        await Task.Delay(10);
+        Console.WriteLine($"{gameSession.IsMyTurn}");
         Console.WriteLine($"Atacando {coordinates}");
+        await Task.Delay(1000);
     }
 
     public char[,] GetBoard()
@@ -24,8 +40,9 @@ public class GameController : IController
         return new char[10,10]; // Ejemplo
     }
 
-    public async Task ExitGame()
+    public async Task Surrender()
     {
-        await _router.NavigateTo<LoginController>();
+        await networkClient.SendAndWaitForResponseAsync("SURRENDER|", BattleProtocol.OK);
+        await router.NavigateTo<LobbyController>();
     }
 }

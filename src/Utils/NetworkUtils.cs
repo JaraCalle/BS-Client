@@ -1,4 +1,4 @@
-using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 public static class NetworkUtils
@@ -19,4 +19,19 @@ public static class NetworkUtils
 
         return await receiveTask; // Mejor usar await que .Result
     }
+    
+    public static async Task<string> GetPublicIpAddressAsync()
+    {
+        try
+        {
+            using HttpClient client = new();
+            return await client.GetStringAsync("https://api64.ipify.org");
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error obteniendo la IP pública", ex);
+            return "Error";
+        }
+    }
+
 }
