@@ -18,10 +18,12 @@ public static class BattleProtocol
     
     // Control de la partida
     public const string GAME_START = "GAME_START";
+    public const string PLACE_SHIPS = "PLACE_SHIPS";
     public const string ATTACK = "ATTACK";
     public const string ATTACK_RESULT = "ATTACK_RESULT";
     public const string TURN = "TURN";
     public const string GAME_OVER = "GAME_OVER";
+    public const string SURRENDER = "SURRENDER";
     public const string ERROR = "ERROR";
     
     // Confirmaciones
@@ -52,9 +54,9 @@ public static class BattleProtocol
     }
     
     //Construye mensaje de aceptación de invitación
-    public static string BuildInvitationAckMessage()
+    public static string BuildPlaceShipsMessage()
     {
-        return $"{INVITE_ACK}{COMMAND_DELIMITER}{COMMAND_END}";
+        return $"{PLACE_SHIPS}{COMMAND_DELIMITER}{COMMAND_END}";
     }
 
     //Construye mensaje de aceptación de invitación
@@ -68,6 +70,12 @@ public static class BattleProtocol
     public static string BuildAttackMessage(int x, int y)
     {
         return $"{ATTACK}{COMMAND_DELIMITER}{x}{PARAMS_DELIMITER}{y}{COMMAND_END}";
+    }
+    
+    // Construye mensaje de ff
+    public static string BuildSurrenderMessage()
+    {
+        return $"{SURRENDER}{COMMAND_DELIMITER}{COMMAND_END}";
     }
 
     //Construye mensaje de desconexión

@@ -27,7 +27,7 @@ public class InviteUsersController(INetworkClient networkClient, Router router, 
         {
             do
             {
-                string response = await networkClient.ReceiveWithTimeout(TimeSpan.FromSeconds(30));
+                string response = await networkClient.ReceiveWithTimeout(TimeSpan.FromSeconds(15));
                 var commandStack = BattleProtocol.ParseMessage(response);
                 
                 foreach (var (command, parameters) in commandStack)
@@ -56,6 +56,10 @@ public class InviteUsersController(INetworkClient networkClient, Router router, 
                     }
                 }
                 if (flag) break;
+                else
+                {
+                    AnsiConsole.MarkupLine("Esperando que el servidor te responda...");
+                }
             } while(true);
         }
         catch (Exception e)
