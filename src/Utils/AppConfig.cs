@@ -1,3 +1,6 @@
+using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
+
 public class AppConfig
 {
     public string Host { get; set; } = "127.0.0.1";
@@ -9,7 +12,13 @@ public class AppConfig
             Log.Warning($"Archivo de configuración no encontrado, {filePath}");
 
         string json = File.ReadAllText(filePath);
-        return System.Text.Json.JsonSerializer.Deserialize<AppConfig>(json)
+        
+        var options = new JsonSerializerOptions
+        {
+            TypeInfoResolver = new DefaultJsonTypeInfoResolver()
+        };
+        
+        return JsonSerializer.Deserialize<AppConfig>(json, options)
                ?? throw new InvalidOperationException("Error al deserializar config.json");
     }
 }

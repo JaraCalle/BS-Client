@@ -19,7 +19,9 @@ public class InviteUsersController(INetworkClient networkClient, Router router, 
 
     public async Task InviteUserAsync(string playerName)
     {
+        AnsiConsole.Clear();
         playerName = playerName.Replace(":Available", "");
+        AnsiConsole.MarkupLine($"Esperando que [green]{playerName}[/] responda tu invitación...");
         await networkClient.SendAndWaitForResponseAsync(BattleProtocol.BuildInviteMessage(playerName), BattleProtocol.OK);
         string aceptation;
         bool flag = false; 
@@ -27,7 +29,7 @@ public class InviteUsersController(INetworkClient networkClient, Router router, 
         {
             do
             {
-                string response = await networkClient.ReceiveWithTimeout(TimeSpan.FromSeconds(15));
+                string response = await networkClient.ReceiveWithTimeout(TimeSpan.FromSeconds(1));
                 var commandStack = BattleProtocol.ParseMessage(response);
                 
                 foreach (var (command, parameters) in commandStack)

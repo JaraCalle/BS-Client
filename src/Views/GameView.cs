@@ -38,10 +38,12 @@ public class GameView : IView
             .TakeLast(10)
             .ToList();
 
+        string indexes = "   1 2 3 4 5 6 7 8 9 10";
+        table.AddRow(indexes, indexes);
         for (int i = 0; i < 10; i++)
         {
-            var playerRow = string.Join(" ", _controller.GetPlayerBoard().GetRow(i));
-            var enemyRow = string.Join(" ", _controller.GetOpponentBoard().GetRow(i));
+            var playerRow = $"{(char)('A' + i)}. " + string.Join(" ", _controller.GetPlayerBoard().GetRow(i));
+            var enemyRow = $"{(char)('A' + i)}. " + string.Join(" ", _controller.GetOpponentBoard().GetRow(i));
             var historyRow = i < history.Count ? history[i] : "";
 
             table.AddRow(playerRow, enemyRow, historyRow);

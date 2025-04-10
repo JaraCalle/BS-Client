@@ -63,20 +63,25 @@ public class GameController(INetworkClient networkClient, Router router, Player 
 
         AnsiConsole.Clear();
         AnsiConsole.Write(new Panel(gameOverText).Border(BoxBorder.Double).Expand());
-        await Task.Delay(TimeSpan.FromSeconds(10));
+        await Task.Delay(TimeSpan.FromSeconds(5));
         await router.NavigateTo<LobbyController>();
     }
 
-    private async Task HandleAttackResult(string[] parameters)
+    private Task HandleAttackResult(string[] parameters)
     {
         string attackResult = parameters[3];
         string attackerName = parameters[0];
         int x = int.Parse(parameters[1]);
         int y = int.Parse(parameters[2]);
+
+        if (x == -1 || y == -1)
+        {
+            return Task.CompletedTask;
+        }
         
         string subAttackerName = attackerName == player.Name ? $"[bold green]{attackerName}[/]" : $"[bold red]{attackerName}[/]";
         char xCoord = (char)('A' + x); 
-        string historyMessage = $"{subAttackerName}: [[{xCoord}{y}]] - {attackResult}";
+        string historyMessage = $"{subAttackerName}: [[{xCoord}{y+1}]] - {attackResult}";
         gameSession.AttackHistory.Add(historyMessage);
 
         if (attackerName == player.Name)
@@ -88,6 +93,8 @@ public class GameController(INetworkClient networkClient, Router router, Player 
         {
             gameSession.PlayerBoard[x, y] = attackResult is "HIT" or "SINK" ? "[green]\u233e[/]" : "[red]\u292b[/]";
         }
+
+        return Task.CompletedTask;
     }
 
 
