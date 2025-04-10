@@ -1,3 +1,12 @@
 # C# compilation folders
 bin
 obj
+
+# Rider files
+.idea
+
+# Release files
+publish
+
+# Log files
+*.log
