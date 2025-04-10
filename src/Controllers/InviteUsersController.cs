@@ -29,7 +29,7 @@ public class InviteUsersController(INetworkClient networkClient, Router router, 
         {
             do
             {
-                string response = await networkClient.ReceiveWithTimeout(TimeSpan.FromSeconds(1));
+                string response = await networkClient.ReceiveWithTimeout(TimeSpan.FromSeconds(15));
                 var commandStack = BattleProtocol.ParseMessage(response);
                 
                 foreach (var (command, parameters) in commandStack)
